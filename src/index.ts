@@ -6,17 +6,16 @@ dotenv.config();
 (async () => {
 
   //************ WATCH OUT QUOTE ONLY */
-  const quoteOnly = true;
+  const quoteOnly = false;
   const integratorID = "trustwallet-api"; //""
-  const nativeSwap = false;
   //************ WATCH OUT QUOTE ONLY */
   
   // instantiate the SDK
   const squid = new Squid();
 
   squid.setConfig({
-    baseUrl: "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app", // for mainnet use "https://api.0xsquid.com" "https://testnet.api.squidrouter.com"
-    integratorId: "trustwallet-api"
+    baseUrl: "https://api.squidrouter.com", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
+    integratorId: integratorID
   });
 
   // init the SDK
@@ -25,13 +24,13 @@ dotenv.config();
 
   const sourceChain = squid.chains.find(
     c =>
-      c.chainName === ChainName.AVALANCHE
+      c.chainName === ChainName.FANTOM
   );
   console.log(`source chain : ${sourceChain?.chainName} , ${sourceChain?.chainId}`);
   
   const destChain = squid.chains.find(
     c =>
-      c.chainName === ChainName.OSMOSIS
+      c.chainName === ChainName.AVALANCHE
   );
   console.log(`destination chain : ${destChain?.chainName} , ${destChain?.chainId}`);
 
@@ -43,15 +42,15 @@ dotenv.config();
     //     t.symbol == "axlUSDC"
     // )!.address, 
     fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-    fromAmount: "500000000000000000", // 0.1
+    fromAmount: "30000000000000000000", // 0.1
     toChain: destChain!.chainId, // 
-    // toToken: squid.tokens.find(
-    //   t => 
-    //     t.chainId == destChain?.chainId &&
-    //     t.symbol == "axlUSDC"
-    // )!.address, 
-    toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-    toAddress: "osmo1czjgvx8m2579zf5qeus3z59pgn6d6722kcphyq", // the recipient of the trade
+    toToken: squid.tokens.find(
+      t => 
+        t.chainId == destChain?.chainId &&
+        t.symbol == "axlUSDC"
+    )!.address, 
+    // toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    toAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188", // the recipient of the trade
     slippage: 1.00, // 1.00 = 1% max slippage across the entire route
     enableForecall: true, // instant execution service, defaults to true
     quoteOnly: quoteOnly, // optional, defaults to false
