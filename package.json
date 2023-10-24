@@ -6,6 +6,11 @@
   "license": "MIT",
   "dependencies": {
     "@0xsquid/sdk": "^1.8.0",
+    "@0xsquid/squid-types": "^0.1.29",
+    "@axelar-network/axelarjs-sdk": "^0.13.6",
+    "@babel/parser": "^7.23.0",
+    "@babel/traverse": "^7.23.2",
+    "@babel/types": "^7.23.0",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
     "node": "^20.5.0",
@@ -14,9 +19,11 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
+    "find": "ts-node src/find-v2-tokens-to-add.ts",
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/babel__traverse": "^7.20.3",
     "@types/node": "^20.4.9"
   }
 }

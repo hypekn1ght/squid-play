@@ -1,6 +1,7 @@
 import { Squid, TokenData, ChainData, ChainName } from "@0xsquid/sdk";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
+import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 dotenv.config();
 
 (async () => {
@@ -12,6 +13,10 @@ dotenv.config();
   
   // instantiate the SDK
   const squid = new Squid();
+
+  const axelar = new AxelarQueryAPI({
+    environment: Environment.MAINNET,
+  });
 
   squid.setConfig({
     baseUrl: "https://api.squidrouter.com", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
@@ -35,14 +40,14 @@ dotenv.config();
   console.log(`destination chain : ${destChain?.chainName} , ${destChain?.chainId}`);
 
   const params = {
-    fromChain: sourceChain!.chainId, // avalanche
-    // fromToken: squid.tokens.find(
-    //   t => 
-    //     t.chainId == sourceChain?.chainId &&
-    //     t.symbol == "axlUSDC"
-    // )!.address, 
-    fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-    fromAmount: "30000000000000000000", // 0.1
+    fromChain: sourceChain!.chainId, 
+    fromToken: squid.tokens.find(
+      t => 
+        t.chainId == sourceChain?.chainId &&
+        t.symbol == "axlUSDC"
+    )!.address, 
+    // fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    fromAmount: "4000000", // 0.1
     toChain: destChain!.chainId, // 
     toToken: squid.tokens.find(
       t => 
@@ -70,9 +75,15 @@ dotenv.config();
     const PK = process.env.PRIVATE_KEY!;
     const provider = new ethers.providers.JsonRpcProvider(sourceChain?.rpc);
     const signer = new ethers.Wallet(PK, provider);
+
+    const overrides = {
+      maxPriorityFeePerGas: ethers.utils.parseUnits("20", "gwei"),
+      maxFeePerGas: ethers.utils.parseUnits("300", "gwei"),
+    };
     const tx = (await squid.executeRoute({
       signer,
       route,
+      overrides
     })) as ethers.providers.TransactionResponse;
     const txReceipt = await tx.wait();
 
