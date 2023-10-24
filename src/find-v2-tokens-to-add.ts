@@ -21,25 +21,15 @@ if (!chain) {
 let homeDir = os.homedir();
 
 let v1FileLoc = `${homeDir}/Documents/squid/squid-core/packages/api/src/v1/constants/tokens/mainnet/${chain}.json`;
-var v1Tokens: Token[] = [];
-fs.access(v1FileLoc, (err) => {
-    if(err) {
-        console.log("v1 chain assetlist doesn't exist");
-    } else {
-        let v1File = fs.readFileSync(v1FileLoc, "utf-8");
-        v1Tokens = JSON.parse(v1File);
-    }
-})
+var v1File = fs.readFileSync(v1FileLoc);
+let v1Tokens = JSON.parse(v1File.toString());
 
 let v1Set: Set<string> = new Set;
 
 // loop through v1Tokens and have a set of IDs
-if (v1Tokens.length > 0) {
-    for (let token of v1Tokens) {
-        v1Set.add(token.address);
-    }
+for (let token of v1Tokens) {
+    v1Set.add(token.address);
 }
-
 
 let v2FileLoc = `${homeDir}/Downloads/AxelarTokens/mainnet/${chain}.ts`;
 let v2File = fs.readFileSync(v2FileLoc, 'utf-8');
