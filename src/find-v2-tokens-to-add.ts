@@ -21,14 +21,19 @@ if (!chain) {
 let homeDir = os.homedir();
 
 let v1FileLoc = `${homeDir}/Documents/squid/squid-core/packages/api/src/v1/constants/tokens/mainnet/${chain}.json`;
-var v1File = fs.readFileSync(v1FileLoc);
-let v1Tokens = JSON.parse(v1File.toString());
-
+var v1File, v1Tokens;
+let v1Count: number = 0;
 let v1Set: Set<string> = new Set;
-
-// loop through v1Tokens and have a set of IDs
-for (let token of v1Tokens) {
-    v1Set.add(token.address);
+try {
+    v1File = fs.readFileSync(v1FileLoc);
+    v1Tokens = JSON.parse(v1File.toString());
+    // loop through v1Tokens and have a set of IDs
+    for (let token of v1Tokens!) {
+        v1Set.add(token.address);
+        v1Count++;
+    }
+} catch (err) {
+    console.log(`❌ ${chain} v1 json doesn't exist ❌`);
 }
 
 let v2FileLoc = `${homeDir}/Downloads/AxelarTokens/mainnet/${chain}.ts`;
@@ -56,8 +61,8 @@ traverse(ast, {
                             if (key == "subGraphOnly") key = "bridgeOnly";
                             const valueNode = prop.value;
                             if (
-                                t.isStringLiteral(valueNode) || 
-                                t.isNumericLiteral(valueNode) || 
+                                t.isStringLiteral(valueNode) ||
+                                t.isNumericLiteral(valueNode) ||
                                 t.isBooleanLiteral(valueNode)
                             ) {
                                 obj[key] = valueNode.value;
@@ -67,33 +72,40 @@ traverse(ast, {
                                 // add path key which doesn't exist in v2
                                 if (key == "ibcDenom") {
                                     obj["address"] = valueNode.value;
-                                    obj["pathKey"] = obj["symbol"].toLowerCase() +`_${chain}`;
+                                    obj["pathKey"] = obj["symbol"].toLowerCase() + `_${chain}`;
                                 }
-                            } 
+                            }
                         }
                     });
                     return obj;
                 }
                 return {};
             });
-            path.stop();  // Stop traversing once we've found what we're looking for
+            path.stop(); 
         }
     },
 });
 
-let tokensToAdd : Token[] | null = [];
+let tokensToAdd: Token[] | null = [];
+let v2Count: number = 0;
+let toAddCount: number = 0;
 
 for (let token of v2tokens!) {
-    if (!v1Set.has(token.ibcDenom!)){
+    v2Count++;
+    if (!v1Set.has(token.address!)) {
         tokensToAdd.push(token);
+        toAddCount++ 
     }
 }
 
 if (tokensToAdd.length > 0) {
     const jsonToLog = JSON.stringify(tokensToAdd);
-    console.log(jsonToLog);
+    console.log("➕➕➕➕➕➕➕➕➕➕➕➕")
+    console.dir(jsonToLog, {depth: null});
+    fs.writeFileSync('./buffer.json', jsonToLog, 'utf-8');
+    console.log(`v1 count: ${v1Count}, v2 count: ${v2Count}, to add: ${toAddCount}`);
     process.exit(0);
 } else {
-    console.error(`No tokens to add on ${chain}`);
-    process.exit(1);
+    console.error(`No tokens to add on ${chain} ✅`);
+    process.exit(0);
 }
