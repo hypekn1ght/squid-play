@@ -20,7 +20,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "find": "ts-node src/find-v2-tokens-to-add.ts",
-    "check": "ts-node src/rpc-check.ts",
+    "rpc-check": "ts-node src/rpc-check.ts",
+    "chain-status": "ts-node src/chain-status.ts",
     "build": "tsc"
   },
   "devDependencies": {

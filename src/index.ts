@@ -2,12 +2,17 @@ import { Squid, TokenData, ChainData, ChainName } from "@0xsquid/sdk";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
+import { DexName } from "@0xsquid/squid-types";
 dotenv.config();
+
+
+const ZERO_POINT_ONE = "100000000000000000";
+const ONE = "1000000000000000000";
 
 (async () => {
 
   //************ WATCH OUT QUOTE ONLY */
-  const quoteOnly = false;
+  const quoteOnly = true;
   const integratorID = "trustwallet-api"; //""
   //************ WATCH OUT QUOTE ONLY */
   
@@ -19,8 +24,7 @@ dotenv.config();
   });
 
   squid.setConfig({
-    baseUrl: "https://api.squidrouter.com", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
-    integratorId: integratorID
+    baseUrl: "https://squid-api-git-feat-smallamountquotes-0xsquid.vercel.app", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
   });
 
   // init the SDK
@@ -29,7 +33,7 @@ dotenv.config();
 
   const sourceChain = squid.chains.find(
     c =>
-      c.chainName === ChainName.FANTOM
+      c.chainName === ChainName.CELO
   );
   console.log(`source chain : ${sourceChain?.chainName} , ${sourceChain?.chainId}`);
   
@@ -38,33 +42,34 @@ dotenv.config();
       c.chainName === ChainName.AVALANCHE
   );
   console.log(`destination chain : ${destChain?.chainName} , ${destChain?.chainId}`);
-
   const params = {
     fromChain: sourceChain!.chainId, 
-    fromToken: squid.tokens.find(
-      t => 
-        t.chainId == sourceChain?.chainId &&
-        t.symbol == "axlUSDC"
-    )!.address, 
-    // fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-    fromAmount: "4000000", // 0.1
+    // fromToken: squid.tokens.find(
+    //   t => 
+    //     t.chainId == sourceChain?.chainId &&
+    //     t.symbol == "axlUSDC"
+    // )!.address, 
+    fromToken: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+    fromAmount: ZERO_POINT_ONE, // 0.1
     toChain: destChain!.chainId, // 
-    toToken: squid.tokens.find(
-      t => 
-        t.chainId == destChain?.chainId &&
-        t.symbol == "axlUSDC"
-    )!.address, 
-    // toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    // toToken: squid.tokens.find(
+    //   t => 
+    //     t.chainId == destChain?.chainId &&
+    //     t.symbol == "cUSD"
+    // )!.address, 
+    toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     toAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188", // the recipient of the trade
     slippage: 1.00, // 1.00 = 1% max slippage across the entire route
     enableForecall: true, // instant execution service, defaults to true
     quoteOnly: quoteOnly, // optional, defaults to false
+    prefer: [DexName.CURVE_V2]
     // collectFees: {
     //   integratorAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188",
     //   fee: 10
     // }
   };
-  console.log("starting route gen")
+  console.log("starting route gen");
+  console.log(params);
   const { route } = await squid.getRoute(params);
   console.log(`fees: ${JSON.stringify(route.estimate.feeCosts, null, 2)}`);
 
