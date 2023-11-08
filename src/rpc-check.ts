@@ -20,8 +20,8 @@ async function rpc_check() {
     console.log(`chain not specified`);
     process.exit(1);
   }
-  const url = `https://api.github.com/repos/cosmos/chain-registry/contents/${chain}/chain.json`;
-  //   const url = `https://api.github.com/repos/cosmos/chain-registry/contents/testnets/${chain}testnet/chain.json`;
+  // const url = `https://api.github.com/repos/cosmos/chain-registry/contents/${chain}/chain.json`;
+    const url = `https://api.github.com/repos/cosmos/chain-registry/contents/testnets/${chain}testnet/chain.json`;
   try {
     console.log("starting fetch");
     const response = await axios.get(url, {

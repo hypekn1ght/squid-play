@@ -5,7 +5,7 @@ import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 import { DexName } from "@0xsquid/squid-types";
 dotenv.config();
 
-
+const LOW_AMOUNT = "60000000000000";
 const ZERO_POINT_ONE = "100000000000000000";
 const ONE = "1000000000000000000";
 
@@ -24,7 +24,7 @@ const ONE = "1000000000000000000";
   });
 
   squid.setConfig({
-    baseUrl: "https://squid-api-git-feat-smallamountquotes-0xsquid.vercel.app", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
+    baseUrl: "https://api.squidrouter.com", // for mainnet use "https://squid-api-git-main-cosmos-mainnet-0xsquid.vercel.app" "https://testnet.api.squidrouter.com"
   });
 
   // init the SDK
@@ -33,7 +33,7 @@ const ONE = "1000000000000000000";
 
   const sourceChain = squid.chains.find(
     c =>
-      c.chainName === ChainName.CELO
+      c.chainName === ChainName.OPTIMISM
   );
   console.log(`source chain : ${sourceChain?.chainName} , ${sourceChain?.chainId}`);
   
@@ -49,20 +49,22 @@ const ONE = "1000000000000000000";
     //     t.chainId == sourceChain?.chainId &&
     //     t.symbol == "axlUSDC"
     // )!.address, 
+    fromAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188",
+    // fromToken: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
     fromToken: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
-    fromAmount: ZERO_POINT_ONE, // 0.1
+    fromAmount: LOW_AMOUNT, // 0.1
     toChain: destChain!.chainId, // 
-    // toToken: squid.tokens.find(
-    //   t => 
-    //     t.chainId == destChain?.chainId &&
-    //     t.symbol == "cUSD"
-    // )!.address, 
-    toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    toToken: squid.tokens.find(
+      t => 
+        t.chainId == destChain?.chainId &&
+        t.symbol == "axlUSDC"
+    )!.address, 
+    // toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     toAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188", // the recipient of the trade
     slippage: 1.00, // 1.00 = 1% max slippage across the entire route
-    enableForecall: true, // instant execution service, defaults to true
+    // enableForecall: true, // instant execution service, defaults to true
     quoteOnly: quoteOnly, // optional, defaults to false
-    prefer: [DexName.CURVE_V2]
+    prefer: [DexName.VELODROME_V2]
     // collectFees: {
     //   integratorAddress: "0xE5ebC33267Dda14a1eEFf4d09eaEAF8032f8F188",
     //   fee: 10

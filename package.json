@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@0xsquid/sdk": "^1.8.0",
-    "@0xsquid/squid-types": "^0.1.29",
+    "@0xsquid/sdk": "^1.14.4",
+    "@0xsquid/squid-types": "0.1.30",
     "@axelar-network/axelarjs-sdk": "^0.13.6",
     "@babel/parser": "^7.23.0",
     "@babel/traverse": "^7.23.2",
@@ -21,6 +21,7 @@
     "start": "ts-node src/index.ts",
     "find": "ts-node src/find-v2-tokens-to-add.ts",
     "rpc-check": "ts-node src/rpc-check.ts",
+    "common-key-check": "ts-node src/common-key-check.ts",
     "chain-status": "ts-node src/chain-status.ts",
     "build": "tsc"
   },
